@@ -2,6 +2,8 @@ import sqlite3
 
 # Path to the SQLite database used throughout the module
 DB_PATH = "books.db"
+cn = sqlite3.connect("books.db")
+cur=cn.cursor()
 
 class Authors:
     id: int = 0
@@ -19,7 +21,8 @@ class Authors:
         self.grade = grade
     def __str__(self):
         return f"authors:\n id:{self.id}, national_code:{self.national_code}, name:{self.name}, last_name:{self.last_name}, birthday:{self.birthday}, grade:{self.grade}"
-
+    def __eq__(self, other):
+        return self.id==other.id
 class Translators:
     id: int = 10
     national_code: str = ""
@@ -34,6 +37,8 @@ class Translators:
         self.grade = grade
     def __str__(self):
         return f"Translators:\n id:{self.id}, national_code:{self.national_code}, name:{self.name}, last_name:{self.last_name}, grade:{self.grade}"
+    def __eq__(self, other):
+        return self.id==other.id
 
 class Esrb_ratings:
     id: int = 0
@@ -43,6 +48,8 @@ class Esrb_ratings:
         self.esrb_name = esrb_name
     def __str__(self):
         return f"esrb_rating:\n id:{self.id}, esrb_name:{self.esrb_name}"
+    def __eq__(self, other):
+        return self.id==other.id
 
 class Publishers:
     id: int = 0
@@ -62,7 +69,8 @@ class Publishers:
         self.establish_date = establish_date
     def __str__(self):
         return f"Publishers:\n id:{self.id}, name:{self.name}, address:{self.address}, phone_number:{self.phone_number}, fax_number:{self.fax_number}, email:{self.email}, establish_date:{self.establish_date}"
-
+    def __eq__(self, other):
+        return self.id==other.id
 class Resources:
     id: int = 0
     title: str = ""
@@ -75,6 +83,8 @@ class Resources:
         self.establish_date = establish_date
     def __str__(self):
         return f"Resources:\n id:{self.id}, title:{self.title}, type:{self.type}, establish_date:{self.establish_date}"
+    def __eq__(self, other):
+        return self.id==other.id
 
 class Genres:
     id: int = 0
@@ -84,6 +94,8 @@ class Genres:
         self.name = name
     def __str__(self):
         return f"Genres:\n id:{self.id}, name:{self.name}"
+    def __eq__(self, other):
+        return self.id==other.id
 
 class Languages:
     id: int = 0
@@ -93,6 +105,42 @@ class Languages:
         self.name = name
     def __str__(self):
         return f"Languages:\n id:{self.id}, Name:{self.name}"
+    def __eq__(self, other):
+        return self.id==other.id
+class Book:
+    id:int=int()
+    name:str=str()
+    title:str=str()
+    description:str=str()
+    esrb_rating:Esrb_ratings=None
+    publisher:Publishers=None
+    resources:list[Resources]=list()
+    authors:list[Authors]=list
+    translators:list[Translators]=list()
+    genreses:list[Genres]=list()
+    languages:list[Languages]=list()
+
+class BooksDataAdapter:
+    @staticmethod
+    def get_all()->list:
+        books=[]
+        boks=cur.execute("SELECT * FROM books").fetchall()
+        data_nn=cur.execute("SELECT id,name,title,description,esrb_rating_id,publisher_id,author_id,translator_id,resource_id,language_id,genre_id FROM books INNER JOIN book_author ON books.id=book_author.book_id INNER JOIN book_translator ON book_author.book_id=book_translator.book_id INNER JOIN book_resource ON book_translator.book_id=book_resource.book_id INNER JOIN book_language ON book_resource.book_id=book_language.book_id INNER JOIN book_genre ON book_language.book_id=book_genre.book_id;").fetchall()
+        resources=ResourcesDataAdapter.get_all()
+        authors=AuthorsDataAdapter.get_all()
+        translators=TranslatorsDataAdapter.get_all()
+        genres=GenresDataAdapter.get_all()
+        languages=LanguagesDataAdapter.get_all()
+        for book in boks:
+            res=[resource for id in set([dt[8] for dt in data_nn if dt[0]==book[0]]) for resource in resources if resource==id]
+            aut=[author for id in set([dt[6] for dt in data_nn if dt[0]==book[0]]) for author in authors if author==id]
+            tra=[translator for id in set([dt[7] for dt in data_nn if dt[0]==book[0]]) for translator in translators if translator==id]
+            gen=[genre for id in set([dt[10] for dt in data_nn if dt[0]==book[0]]) for genre in genres if genre==id]
+            lan=[language for id in set([dt[9] for dt in data_nn if dt[0]==book[0]]) for language in languages if language==id]
+
+            books.append(Book(book[0],book[1],book[2],book[3],book[4],book[5],res,aut,tra,gen,lan))
+        
+        return books
 
 class AuthorsDataAdapter:
     @staticmethod
@@ -322,21 +370,22 @@ publishers_list = PublishersDataAdapter.get_all()
 resources_list = ResourcesDataAdapter.get_all()
 genres_list = GenresDataAdapter.get_all()
 languages_list = LanguagesDataAdapter.get_all()
-
-for author in authors_list:
-    print(author)
-for translator in translators_list:
-    print(translator)
-for esrb in esrb_list:
-    print(esrb)
-for publisher in publishers_list:
-    print(publisher)
-for resource in resources_list:
-    print(resource)
-for genre in genres_list:
-    print(genre)
-for language in languages_list:
-    print(language)
+for book in BooksDataAdapter.get_all():
+    print(book)
+# for author in authors_list:
+#     print(author)
+# for translator in translators_list:
+#     print(translator)
+# for esrb in esrb_list:
+#     print(esrb)
+# for publisher in publishers_list:
+#     print(publisher)
+# for resource in resources_list:
+#     print(resource)
+# for genre in genres_list:
+#     print(genre)
+# for language in languages_list:
+#     print(language)
 
 p1 = Languages(0, "English")
 inserted_publisher = LanguagesDataAdapter.insert(p1)
