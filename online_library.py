@@ -255,12 +255,12 @@ class TranslatorsDataAdapter:
             return True
         return False
     def search(name:str,last_name:str):
-        authors=[]
+        translators=[]
         translator=cur.execute(f"SELECT * FROM translators where name LIKE '%{name}%' AND last_name LIKE '%{last_name}%'").fetchall()
 
         for transl in translator:
-            authors.append(Translator(transl[0],transl[1],transl[2],transl[3],transl[4]))
-        return authors
+            translators.append(Translator(transl[0],transl[1],transl[2],transl[3],transl[4]))
+        return translators
 
 
 class PublishersDataAdapter:
@@ -286,6 +286,13 @@ class PublishersDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str):
+        publishers=[]
+        publisher=cur.execute(f"SELECT * FROM publishers where name LIKE '%{name}%'").fetchall()
+
+        for pupli in publisher:
+            publishers.append(Publisher(pupli[0],pupli[1],pupli[2],pupli[3],pupli[4],pupli[5],pupli[6]))
+        return publishers
 
 
 
@@ -312,6 +319,15 @@ class ResourcesDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str,title:str):
+        resources=[]
+        resource=cur.execute(f"SELECT * FROM resource where name LIKE '%{title}%'").fetchall()
+
+        for resor in resource:
+            resources.append(Resource(resor[0],resor[1],resor[2],resor[3]))
+        return resources
+
+    
 
 
 
@@ -340,6 +356,13 @@ class EsrbsDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str,esrb_name:int):
+        esrbsess=[]
+        esrbses=cur.execute(f"SELECT * FROM esrb_ratings where name LIKE '%{esrb_name}%'").fetchall()
+
+        for esrbse in esrbses:
+            esrbsess.append(Esrb(esrbse[0],esrbse[1]))
+        return esrbsess
 
 
 
