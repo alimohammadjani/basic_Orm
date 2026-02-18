@@ -230,6 +230,7 @@ class AuthorsDataAdapter:
         return authors
 
 
+
 class TranslatorsDataAdapter:
     @staticmethod
     def get_all()->list:
@@ -253,7 +254,13 @@ class TranslatorsDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str,last_name:str):
+        authors=[]
+        translator=cur.execute(f"SELECT * FROM translators where name LIKE '%{name}%' AND last_name LIKE '%{last_name}%'").fetchall()
 
+        for transl in translator:
+            authors.append(Translator(transl[0],transl[1],transl[2],transl[3],transl[4]))
+        return authors
 
 
 class PublishersDataAdapter:
