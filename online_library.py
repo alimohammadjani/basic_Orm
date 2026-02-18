@@ -356,7 +356,7 @@ class EsrbsDataAdapter:
             cn.commit()
             return True
         return False
-    def search(name:str,esrb_name:int):
+    def search(esrb_name:int):
         esrbsess=[]
         esrbses=cur.execute(f"SELECT * FROM esrb_ratings where name LIKE '%{esrb_name}%'").fetchall()
 
@@ -389,6 +389,13 @@ class GenresDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str,esrb_name:int):
+        genres=[]
+        genre=cur.execute(f"SELECT * FROM genres where name LIKE '%{name}%'").fetchall()
+
+        for genrese in genre:
+            genres.append(Genre(genrese[0],genrese[1]))
+        return genres
 
 
 
@@ -415,6 +422,13 @@ class LanguagesDataAdapter:
             cn.commit()
             return True
         return False
+    def search(name:str):
+        languages=[]
+        language=cur.execute(f"SELECT * FROM languages where name LIKE '%{name}%'").fetchall()
+
+        for Lang in language:
+            languages.append(Language(Lang[0],Lang[1]))
+        return languages
 
 
 
